@@ -82,7 +82,7 @@ def main(sims):
         start = time.time()
 
         # The vanilla crm
-        processes = [pool.apply_async(wrapper, args=(seed, )) for seed in range(sims)]
+        processes = [pool.apply_async(wrapper, args=(seed, N)) for seed in range(sims)]
         output = [p.get() for p in processes]
         fname = 'results/fixed/fixed_N_{}_sims_{}.csv'
         pd.concat(output).to_csv(fname.format(N, sims), index=False)
