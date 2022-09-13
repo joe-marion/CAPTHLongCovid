@@ -36,7 +36,7 @@ def wrapper(seed, N):
         names=['Brain Fog', 'PEM', 'Dyspnea', 'Fatigue', 'Headache'],
         prevalence=np.array([0.20, 0.25, 0.15, 0.30, 0.10]),
         accrual_rate=20,
-        dropout_rate=0.0001
+        dropout_rate=0.00000001
     )
     patients.enroll_n(N, 0, domains)
 
@@ -49,26 +49,25 @@ def wrapper(seed, N):
     stan_fit, est = fit_stan_model(stan_data, sm=SM)
     lm_est = fit_linear_model(stan_data)
     est.update(lm_est)
-
-    # Treatment data summary
-    treatment = data.query("Antihistamine >0"). \
-        groupby([d.name for d in domains] + ['strata'], as_index=False). \
-        aggregate({'endpoint': 'mean', 'arrival': 'count'}). \
-        rename(columns={'endpoint': 'treatment_mean', 'arrival': 'treatment'})
-
-    # Control data summary
-    control = data.query("Antihistamine == 0"). \
-        groupby([d.name for d in domains] + ['strata'], as_index=False). \
-        aggregate({'endpoint': 'mean', 'arrival': 'count'}). \
-        rename(columns={'endpoint': 'control_mean', 'arrival': 'control'}). \
-        drop([d.name for d in domains], axis=1)
-
-    # Combine and save the results
     cols = ['bayes_mean', 'bayes_super', 'lm_mean', 'lm_super']
-    return treatment. \
-        merge(control, on='strata', how='left'). \
-        join(pd.DataFrame({c: est.get(c) for c in cols})). \
-        assign(sim=seed)
+
+    # Package the results
+    strata_names = ['Brain Fog', 'PEM', 'Dyspnea', 'Fatigue', 'Headache']
+    strata_id = range(len(strata_names))
+
+    drug_names = [a.name for a in domains[0].arms if a.name != 'Placebo']
+    drug_id = range(len(drug_names))
+
+    return pd.DataFrame({
+            'N': N,
+            'sim': seed,
+            # 'strata_name': flatten([strata_names for d in drug_names]),
+            'strata_id': flatten([strata_id + 1 for d in drug_names]),
+            # 'drug_name': flatten([[d for s in strata_names] for d in drug_names]),
+            'drug_id': flatten([[d + 1 for s in strata_names] for d in drug_id]),
+            'effect': flatten([a.effects for a in domains[0].arms if a.name != 'Placebo']),
+        }). \
+        join(pd.DataFrame({c: est.get(c) for c in cols}))
 
 
 def main(sims, N):
