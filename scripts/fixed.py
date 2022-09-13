@@ -60,9 +60,9 @@ def wrapper(seed, N):
             'N': N,
             'sim': seed,
             # 'strata_name': flatten([strata_names for d in drug_names]),
-            'strata_id': flatten([strata_id + 1 for d in drug_names]),
+            'strata_id': flatten([strata_id for d in drug_names]),
             # 'drug_name': flatten([[d for s in strata_names] for d in drug_names]),
-            'drug_id': flatten([[d + 1 for s in strata_names] for d in drug_id]),
+            'drug_id': flatten([[d for s in strata_names] for d in drug_id]),
             'effect': flatten([a.effects for a in domains[0].arms if a.name != 'Placebo']),
         }). \
         join(pd.DataFrame({c: est.get(c) for c in cols}))
