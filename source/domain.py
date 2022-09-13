@@ -1,6 +1,6 @@
 import numpy as np
 from source.arm import Arm, Placebo
-
+from source.utils import stratified_randomization
 
 class Domain:
 
@@ -60,7 +60,7 @@ class Domain:
 
     def randomize_patients(self, strata):
         """
-        Randomizes patients. Doesn't really use strata at the moment, but may use strata later
+        Stratified randomization
 
         Parameters
         ----------
@@ -72,8 +72,16 @@ class Domain:
         """
 
         # Randomize
-        n = len(strata)
-        assignment = np.random.choice(self.ind, size=n, replace=True, p=self.allocation)
+        inds = np.unique(strata)
+        counts = [np.count_nonzero(strata == s) for s in inds]
+        rands = [stratified_randomization(n, self.allocation) for n in counts]
+
+        assignment = np.empty_like(strata)
+        tots = [0 for i in inds]
+
+        for n, s in enumerate(strata):
+            assignment[n] = rands[s][tots[s]]
+            tots[s] += 1
 
         return assignment
 

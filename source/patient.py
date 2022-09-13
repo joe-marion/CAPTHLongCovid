@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 from scipy import stats
+from source.utils import stratified_randomization
 import warnings
 
 
@@ -97,7 +98,7 @@ class StratifiedPatients:
         if n == 0:
             return self._simulate_0()
 
-        strata = np.random.choice(self.ind, size=n, replace=True, p=self.prevalence)
+        strata = stratified_randomization(n, ps=self.prevalence)
 
         # Simulate the riming
         arrival = time + self.accrual_rng.rvs(n).cumsum()
@@ -145,7 +146,7 @@ class StratifiedPatients:
 
         # Otherwise do the simulations
         else:
-            strata = np.random.choice(self.ind, size=n, replace=True, p=self.prevalence)
+            strata = stratified_randomization(n, ps=self.prevalence)
             arrival = time + arrival_[0:n]
             complete = arrival + self.followup[strata]
             dropout = arrival + self.dropout_rng.rvs(n).cumsum()
