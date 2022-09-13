@@ -69,7 +69,7 @@ def wrapper(seed, N):
         rename(columns={'endpoint': 'control_mean', 'arrival': 'control'}). \
         drop('Antihistamine', 1)
 
-    pd.DataFrame({
+    return pd.DataFrame({
             'N': N,
             'sim': seed,
             # 'strata_name': flatten([strata_names for d in drug_names]),
