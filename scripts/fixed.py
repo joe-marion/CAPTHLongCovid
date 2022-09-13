@@ -54,17 +54,32 @@ def wrapper(seed, N):
     strata_id = range(len(strata_names))
 
     drug_names = [a.name for a in domains[0].arms if a.name != 'Placebo']
-    drug_id = range(len(drug_names))
+    drug_id = range(1, 1 + len(drug_names))
 
-    return pd.DataFrame({
+    # Summarize the raw data
+    treatment = data.query("Antihistamine >0"). \
+        groupby([d.name for d in domains] + ['strata'], as_index=False). \
+        aggregate({'endpoint': 'mean', 'arrival': 'count'}). \
+        rename(columns={'endpoint': 'treatment_mean', 'arrival': 'treatment', 'Antihistamine': 'drug'})
+
+    # Summarize the raw data
+    control = data.query("Antihistamine == 0"). \
+        groupby([d.name for d in domains] + ['strata'], as_index=False). \
+        aggregate({'endpoint': 'mean', 'arrival': 'count'}). \
+        rename(columns={'endpoint': 'control_mean', 'arrival': 'control'}). \
+        drop('Antihistamine', 1)
+
+    pd.DataFrame({
             'N': N,
             'sim': seed,
             # 'strata_name': flatten([strata_names for d in drug_names]),
-            'strata_id': flatten([strata_id for d in drug_names]),
+            'strata': flatten([strata_id for d in drug_names]),
             # 'drug_name': flatten([[d for s in strata_names] for d in drug_names]),
-            'drug_id': flatten([[d for s in strata_names] for d in drug_id]),
+            'drug': flatten([[d for s in strata_names] for d in drug_id]),
             'effect': flatten([a.effects for a in domains[0].arms if a.name != 'Placebo']),
         }). \
+        merge(treatment, how='left', on=['drug', 'strata']). \
+        merge(control, how='left', on=['strata']). \
         join(pd.DataFrame({c: est.get(c) for c in cols}))
 
 
