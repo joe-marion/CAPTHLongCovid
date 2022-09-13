@@ -1,5 +1,6 @@
 # Joe stuff
 misc/
+results/
 .idea/
 models/*.pkl
 .Rhistory

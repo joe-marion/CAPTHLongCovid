@@ -23,9 +23,9 @@ def wrapper(seed, N):
     domains = [Domain(
         arms=[
             Arm('Cetirizine', np.zeros(5)),
-            Arm('Loratidine', np.array([-0.66, -0.66, -0.60, -0.66, -0.66])),
-            Arm('+Famotidine (C)', np.array([0.0, 0.0, 0.0, -1.0, 0.0])),
-            Arm('+Famotidine (L)', np.repeat(0, 5)),
+            Arm('Loratidine', np.array([-0.5, -0.5, -0.5, -0.5, -0.5])),
+            Arm('+Famotidine (C)', np.array([0.0, 0.0, 0.0, -0.5, -0.5])),
+            Arm('+Famotidine (L)', np.array([-0.5, -0.5, -0.5, 0.0, 0.0])),
         ],
         name='Antihistamine',
         allocation=np.array([2, 1, 1, 1, 1]) / 6.0
