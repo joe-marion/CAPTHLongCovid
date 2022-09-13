@@ -47,7 +47,7 @@ def wrapper(seed, N):
     stan_fit, est = fit_stan_model(stan_data, sm=SM)
     lm_est = fit_linear_model(stan_data)
     est.update(lm_est)
-    cols = ['bayes_mean', 'bayes_super', 'lm_mean', 'lm_super']
+    cols = ['bayes_mean', 'bayes_super', 'bayes_sd', 'lm_mean', 'lm_super', 'lm_sd']
 
     # Package the results
     strata_names = ['Brain Fog', 'PEM', 'Dyspnea', 'Fatigue', 'Headache']
