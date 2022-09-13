@@ -17,7 +17,7 @@ NS = range(100, 520, 20)
 
 
 def wrapper(seed, N):
-    np.random.seed(seed)
+    # np.random.seed(seed)
 
     # Setup the domains
     domains = [Domain(
@@ -71,22 +71,21 @@ def wrapper(seed, N):
         assign(sim=seed)
 
 
-def main(sims):
+def main(sims, N):
 
     if not os.path.isdir('results/fixed'):
         os.makedirs('results/fixed')
 
     # Cross the main scenarios with offsets
     pool = mp.Pool(processes=mp.cpu_count())
-    for N in NS:
-        start = time.time()
+    start = time.time()
 
-        # The vanilla crm
-        processes = [pool.apply_async(wrapper, args=(seed, N)) for seed in range(sims)]
-        output = [p.get() for p in processes]
-        fname = 'results/fixed/fixed_N_{}_sims_{}.csv'
-        pd.concat(output).to_csv(fname.format(N, sims), index=False)
-        print('N={} complete in {} minutes'.format(N, np.round((time.time() - start) / 60, 1)))
+    # The vanilla crm
+    processes = [pool.apply_async(wrapper, args=(seed, N)) for seed in range(sims)]
+    output = [p.get() for p in processes]
+    fname = 'results/fixed/fixed_N_{}_sims_{}.csv'
+    pd.concat(output).to_csv(fname.format(N, sims), index=False)
+    print('N={} complete in {} minutes'.format(N, np.round((time.time() - start) / 60, 1)))
 
 
 # Press the green button in the gutter to run the script.
@@ -101,5 +100,11 @@ if __name__ == '__main__':
         type='int'
     )
 
+    parser.add_option(
+        '-n',
+        '--N',
+        type='int'
+    )
+
     opts, args = parser.parse_args()
-    main(opts.sims)
+    main(opts.sims, opts.N)
