@@ -8,13 +8,11 @@ from source.domain import Domain
 from source.analysis import *
 
 import multiprocessing as mp
-from numexpr import set_num_threads
-set_num_threads(56)
+#from numexpr import set_num_threads
+#set_num_threads(56)
 import time
 
 SM = StanWrapper('models/simple_model.stan', load=True)
-NS = range(100, 520, 20)
-
 
 def wrapper(seed, N):
     # np.random.seed(seed)
@@ -76,7 +74,7 @@ def main(sims, N):
         os.makedirs('results/fixed')
 
     # Cross the main scenarios with offsets
-    pool = mp.Pool(processes=mp.cpu_count())
+    pool = mp.Pool(processes=48)  # mp.cpu_count())
     start = time.time()
 
     # The vanilla crm
