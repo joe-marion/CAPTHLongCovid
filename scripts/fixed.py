@@ -14,6 +14,7 @@ import time
 
 SM = StanWrapper('models/simple_model.stan', load=True)
 
+
 def wrapper(seed, N):
     # np.random.seed(seed)
 
@@ -62,11 +63,23 @@ def wrapper(seed, N):
         aggregate({'endpoint': 'mean', 'arrival': 'count'}). \
         rename(columns={'endpoint': 'treatment_mean', 'arrival': 'treatment', 'Antihistamine': 'drug'})
 
+    treatment_var = data.query("Antihistamine >0"). \
+        groupby([d.name for d in domains] + ['strata'], as_index=False). \
+        aggregate({'endpoint': 'var'}). \
+        rename(columns={'endpoint': 'treatment_var', 'arrival': 'treatment', 'Antihistamine': 'drug'})
+
+
     # Summarize the raw data
     control = data.query("Antihistamine == 0"). \
         groupby([d.name for d in domains] + ['strata'], as_index=False). \
         aggregate({'endpoint': 'mean', 'arrival': 'count'}). \
         rename(columns={'endpoint': 'control_mean', 'arrival': 'control'}). \
+        drop('Antihistamine', 1)
+
+    control_var = data.query("Antihistamine == 0"). \
+        groupby([d.name for d in domains] + ['strata'], as_index=False). \
+        aggregate({'endpoint': 'var'}). \
+        rename(columns={'endpoint': 'control_var'}). \
         drop('Antihistamine', 1)
 
     return pd.DataFrame({
@@ -79,7 +92,9 @@ def wrapper(seed, N):
             'effect': flatten([a.effects for a in domains[0].arms if a.name != 'Placebo']),
         }). \
         merge(treatment, how='left', on=['drug', 'strata']). \
+        merge(treatment_var, how='left', on=['drug', 'strata']). \
         merge(control, how='left', on=['strata']). \
+        merge(control_var, how='left', on=['strata']). \
         join(pd.DataFrame({c: est.get(c) for c in cols}))
 
 
