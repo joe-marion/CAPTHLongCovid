@@ -134,7 +134,7 @@ def fit_linear_model(stan_data):
 
 def fit_stan_model(stan_data, sm):
     fit = sm.quiet_sampling(stan_data, chains=1, pars=['delta'],
-                            warmup=int(1e3), iter=int(1e3 + 1e3), control={'adapt_delta': 0.9})
+                            warmup=int(1e3), iter=int(1e3 + 4e3), control={'adapt_delta': 0.9})
     deltas = fit.extract()['delta']
 
     return fit, {

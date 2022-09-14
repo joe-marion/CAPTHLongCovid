@@ -15,8 +15,10 @@ import time
 SM = StanWrapper('models/simple_model.stan', load=True)
 
 
-def wrapper(seed, N):
+def wrapper(s, N):
     # np.random.seed(seed)
+    seed = (os.getpid() * int(time.time())) % 123456789
+    np.random.seed(seed)
 
     # Setup the domains
     domains = [Domain(
@@ -84,7 +86,8 @@ def wrapper(seed, N):
 
     return pd.DataFrame({
             'N': N,
-            'sim': seed,
+            'sim': s,
+            'seed': seed,
             # 'strata_name': flatten([strata_names for d in drug_names]),
             'strata': flatten([strata_id for d in drug_names]),
             # 'drug_name': flatten([[d for s in strata_names] for d in drug_names]),
