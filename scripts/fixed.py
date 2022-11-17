@@ -70,7 +70,6 @@ def wrapper(s, N):
         aggregate({'endpoint': 'var'}). \
         rename(columns={'endpoint': 'treatment_var', 'arrival': 'treatment', 'Antihistamine': 'drug'})
 
-
     # Summarize the raw data
     control = data.query("Antihistamine == 0"). \
         groupby([d.name for d in domains] + ['strata'], as_index=False). \
