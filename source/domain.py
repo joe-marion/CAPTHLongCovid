@@ -2,6 +2,7 @@ import numpy as np
 from source.arm import Arm, Placebo
 from source.utils import stratified_randomization
 
+
 class Domain:
 
     def __init__(self, arms, name, allocation=None):
@@ -58,30 +59,15 @@ class Domain:
 
         return np.array([a.name for a in self.arms])
 
-    def randomize_patients(self, strata):
+    def randomize_patients(self, pid, strata):
         """
-        Stratified randomization
-
-        Parameters
-        ----------
-        strata
-
-        Returns
-        -------
-        np.array of indices, indicating the arm to which a patient was randomized (0=placebo)
+        Basic randomization assigns each patient to a single domain. Strata argument is for future proofing.
         """
 
-        # Randomize
-        inds = np.unique(strata)
-        counts = [np.count_nonzero(strata == s) for s in inds]
-        rands = [stratified_randomization(n, self.allocation) for n in counts]
-
-        assignment = np.empty_like(strata)
-        tots = [0 for i in inds]
-
-        for n, s in enumerate(strata):
-            assignment[n] = rands[s][tots[s]]
-            tots[s] += 1
+        assignment = np.array([], dtype='int32')
+        if len(pid) > 0:
+            rands = stratified_randomization(pid.max()+1, self.allocation)
+            assignment = rands[pid]
 
         return assignment
 
