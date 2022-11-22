@@ -47,6 +47,8 @@ def simulate_univariate_data(n, seed, scenario):
         'all': np.repeat(0.0, 5),
         'one': np.array([0.0, 0.0, 0.0, 0.0, -0.5]),
         'two': np.array([0.0, -0.5, -0.5, 0.0, 0.0]),
+        'three': np.array([0.0, -0.5, -0.5, 0.0, -0.5]),
+        'four': np.array([-0.5, -0.5, -0.5, 0.0, -0.5]),
     }
 
     # Initial domains
